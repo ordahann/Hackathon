@@ -1,7 +1,7 @@
 import pandas as pd
 
 # load the data csv and return DataFrame                   
-def load_data(filepath='mokedViewServer/data/data_filled.csv'):
+def load_data(filepath='mokedViewServer/data/DATA.csv'):
     df = pd.read_csv(filepath)
     return df
 

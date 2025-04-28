@@ -54,3 +54,86 @@ export async function getMonthlyTicketsAndOverdues(startDate = null, endDate = n
     if (!response.ok) throw new Error("Failed to fetch monthly tickets and overdues");
     return response.json();
 }
+
+// ----------------------------------------------------------------
+// בניית פרמטרים משותפים
+function buildEmployeeQueryParams(department, subDepartment, startDate, endDate) {
+    const params = new URLSearchParams();
+    if (department) params.append("department", department);
+    if (subDepartment) params.append("sub_department", subDepartment);
+    if (startDate) params.append("start_date", startDate);
+    if (endDate) params.append("end_date", endDate);
+    return params.toString();
+}
+
+// פונקציית עזר לקריאות API
+async function fetchFromApi(endpoint, queryParams = "") {
+    const response = await fetch(`${BASE_URL}${endpoint}?${queryParams}`);
+    if (!response.ok) throw new Error(`Failed to fetch data from ${endpoint}`);
+    return response.json();
+}
+
+// פונקציות לקריאה לכל אחד מה־APIים:
+
+export async function getEmployeesClosedTickets(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/closed-tickets", queryParams);
+}
+
+export async function getEmployeesClosedTicketsPercentage(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/closed-tickets-percentage", queryParams);
+}
+
+export async function getEmployeesTotalTickets(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/total-tickets", queryParams);
+}
+
+export async function getEmployeesTotalTicketsPercentage(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/total-tickets-percentage", queryParams);
+}
+
+export async function getEmployeesSummaryStatus(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/summary-status", queryParams);
+}
+
+export async function getEmployeesOnTimePercentage(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/on-time-percentage", queryParams);
+}
+
+export async function getEmployeesOverduePercentage(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/overdue-percentage", queryParams);
+}
+
+export async function getEmployeesAvgHandlingTime(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/avg-handling-time", queryParams);
+}
+
+export async function getEmployeesTopScores(department, subDepartment, startDate, endDate, minClosedTickets = 10, n = 5) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate) +
+        `&min_closed_tickets=${minClosedTickets}&n=${n}`;
+    return fetchFromApi("/employees/top-scores", queryParams);
+}
+
+export async function getEmployeesTopNScores(department, subDepartment, startDate, endDate, minClosedTickets = 10, n = 5) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate) +
+        `&n=${n}&min_closed_tickets=${minClosedTickets}`;
+    return fetchFromApi("/employees/top-n-scores", queryParams);
+}
+
+export async function getEmployeesMonthlyTrends(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/monthly-trends", queryParams);
+}
+
+export async function getEmployeesPerformanceTable(department, subDepartment, startDate, endDate) {
+    const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
+    return fetchFromApi("/employees/performance-table", queryParams);
+}
+

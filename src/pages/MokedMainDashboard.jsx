@@ -47,7 +47,7 @@ const MokedMainDashboard = () => {
   const totalOverdue = overdueData.reduce((sum, item) => sum + (item.avg_overdue_percentage || 0), 0) / (overdueData.length || 1);
 
   return (
-    <div className="flex-1 overflow-auto relative z-10 text-center">
+    <div className="w-full h-full flex-1 overflow-auto relative z-10 text-center">
       <Header title="דשבורד מנהל המוקד / המועצה" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8 text-center">

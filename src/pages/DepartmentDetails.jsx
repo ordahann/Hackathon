@@ -2,20 +2,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
-import {
-  getEmployeesClosedTickets,
-  getEmployeesOverduePercentage,
-  getEmployeesAvgHandlingTime,
-  getEmployeesTotalTickets,
-  getEmployeesOnTimePercentage,
-} from "../api";
-
+import { getEmployeesPerformanceTable } from "../api";
 import StatCard from "../components/common/StatCard";
 import { Users, CheckCircle, AlertTriangle, Clock } from "lucide-react";
 
 import EmployeesClosedTicketsBarChart from "../components/moked-analytics/EmployeesClosedTicketsBarChart";
 import OverduePieChart from "../components/moked-analytics/OverduePieChart";
 import TopEmployeesList from "../components/moked-analytics/TopEmployeesList";
+import EmployeesPerformanceTable from "../components/moked-analytics/EmployeesPerformanceTable";
 
 const DepartmentDetails = () => {
   const { departmentName } = useParams();
@@ -23,7 +17,6 @@ const DepartmentDetails = () => {
 
   const [subDepartments, setSubDepartments] = useState([]);
   const [selectedSubDepartment, setSelectedSubDepartment] = useState("");
-
   const [employeesData, setEmployeesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,7 +28,7 @@ const DepartmentDetails = () => {
     onTimePercentage: 0,
   });
 
-  // טעינת המחלקות מה־CSV
+  // שליפת מחלקות מה־CSV
   useEffect(() => {
     if (departmentName) {
       setLoading(true);
@@ -62,25 +55,21 @@ const DepartmentDetails = () => {
     }
   }, [departmentName]);
 
-  // טעינת הנתונים לעובדים (מיזוג בלי getEmployeesPerformanceTable)
+  // שליפת נתוני ביצועים
   useEffect(() => {
     if (selectedSubDepartment) {
-      const startDate = "2023-10-01";
+      const startDate = "2023-10-01"; // אפשר לחשב חצי שנה אחורה דינאמית אם תרצי
       const endDate = new Date().toISOString().slice(0, 10);
 
-      Promise.all([
-        getEmployeesTotalTickets(departmentName, selectedSubDepartment, startDate, endDate),
-        getEmployeesClosedTickets(departmentName, selectedSubDepartment, startDate, endDate),
-        getEmployeesOverduePercentage(departmentName, selectedSubDepartment, startDate, endDate),
-        getEmployeesAvgHandlingTime(departmentName, selectedSubDepartment, startDate, endDate),
-        getEmployeesOnTimePercentage(departmentName, selectedSubDepartment, startDate, endDate),
-      ])
-        .then(([totalTicketsData, closedTicketsData, overdueData, handlingTimeData, onTimeData]) => {
-          const totalTickets = totalTicketsData.reduce((sum, emp) => sum + (emp.total_tickets || 0), 0);
-          const closedTickets = closedTicketsData.reduce((sum, emp) => sum + (emp.tickets_handled || 0), 0);
-          const avgOverdue = overdueData.reduce((sum, emp) => sum + (emp.overdue_percentage || 0), 0) / (overdueData.length || 1);
-          const avgHandlingTime = handlingTimeData.reduce((sum, emp) => sum + (emp.avg_handling_time_hours || 0), 0) / (handlingTimeData.length || 1);
-          const avgOnTime = onTimeData.reduce((sum, emp) => sum + (emp.on_time_percentage || 0), 0) / (onTimeData.length || 1);
+      getEmployeesPerformanceTable(departmentName, selectedSubDepartment, startDate, endDate)
+        .then((data) => {
+          setEmployeesData(data);
+
+          const totalTickets = data.reduce((sum, emp) => sum + (emp.total_tickets || 0), 0);
+          const closedTickets = data.reduce((sum, emp) => sum + (emp.tickets_handled || 0), 0);
+          const avgOverdue = data.reduce((sum, emp) => sum + (emp.overdue_percentage || 0), 0) / (data.length || 1);
+          const avgHandlingTime = data.reduce((sum, emp) => sum + (emp.avg_handling_time_hours || 0), 0) / (data.length || 1);
+          const avgOnTime = data.reduce((sum, emp) => sum + (emp.on_time_percentage || 0), 0) / (data.length || 1);
 
           setStats({
             totalTickets,
@@ -89,42 +78,11 @@ const DepartmentDetails = () => {
             avgHandlingTime,
             onTimePercentage: avgOnTime,
           });
-
-          // חיבור העובדים עם הנתונים מכל ה־APIים:
-          const employeesMap = {};
-
-          totalTicketsData.forEach(emp => {
-            employeesMap[emp.employee] = { employee: emp.employee, total_tickets: emp.total_tickets };
-          });
-
-          closedTicketsData.forEach(emp => {
-            if (employeesMap[emp.employee]) {
-              employeesMap[emp.employee].tickets_handled = emp.tickets_handled;
-            }
-          });
-
-          overdueData.forEach(emp => {
-            if (employeesMap[emp.employee]) {
-              employeesMap[emp.employee].overdue_percentage = emp.overdue_percentage;
-            }
-          });
-
-          handlingTimeData.forEach(emp => {
-            if (employeesMap[emp.employee]) {
-              employeesMap[emp.employee].avg_handling_time_hours = emp.avg_handling_time_hours;
-            }
-          });
-
-          onTimeData.forEach(emp => {
-            if (employeesMap[emp.employee]) {
-              employeesMap[emp.employee].on_time_percentage = emp.on_time_percentage;
-            }
-          });
-
-          const mergedData = Object.values(employeesMap);
-          setEmployeesData(mergedData);
         })
-        .catch((err) => console.error("Error fetching employee data:", err));
+        .catch((err) => {
+          console.error("Error fetching employees performance table:", err);
+          setError("שגיאה בשליפת נתוני העובדים.");
+        });
     }
   }, [selectedSubDepartment]);
 
@@ -138,6 +96,7 @@ const DepartmentDetails = () => {
 
   return (
     <div className="w-full h-full overflow-auto p-6 text-center z-10 text-center relative">
+      {/* כפתור חזרה */}
       <div className="absolute top-6 right-6 text-center">
         <button
           onClick={() => navigate(-1)}
@@ -147,8 +106,10 @@ const DepartmentDetails = () => {
         </button>
       </div>
 
+      {/* כותרת */}
       <h1 className="text-3xl mt-10 mb-8 font-bold text-center">{departmentName}</h1>
 
+      {/* בחירת מחלקה */}
       {subDepartments.length > 0 ? (
         <select
           className="p-2 rounded bg-gray-800 text-white border border-gray-600 text-center"
@@ -166,6 +127,7 @@ const DepartmentDetails = () => {
         <p className="text-gray-400 text-center mt-4">אין מחלקות זמינות לאגף זה.</p>
       )}
 
+      {/* סטטיסטיקות */}
       {selectedSubDepartment && (
         <>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8 mt-8">
@@ -177,11 +139,11 @@ const DepartmentDetails = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <EmployeesClosedTicketsBarChart data={employeesData} />
-            <OverduePieChart data={employeesData} />
+            <TopEmployeesList data={employeesData} />  {/* כאן במקום ה־PieChart */}
           </div>
 
           <div className="mt-8">
-            <TopEmployeesList data={employeesData} />
+            <EmployeesPerformanceTable data={employeesData} />  {/* כאן במקום TopEmployeesList */}
           </div>
         </>
       )}

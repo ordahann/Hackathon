@@ -131,9 +131,14 @@ export async function getEmployeesMonthlyTrends(department, subDepartment, start
     const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
     return fetchFromApi("/employees/monthly-trends", queryParams);
 }
-
-export async function getEmployeesPerformanceTable(department, subDepartment, startDate, endDate) {
+  
+  // הפונקציה ששלפת:
+  export async function getEmployeesPerformanceTable(department, subDepartment, startDate, endDate) {
     const queryParams = buildEmployeeQueryParams(department, subDepartment, startDate, endDate);
-    return fetchFromApi("/employees/performance-table", queryParams);
-}
+    const response = await fetch(`${BASE_URL}/employees/performance-table?${queryParams}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch employees performance data: ${response.statusText}`);
+    }
+    return response.json();
+  }
 

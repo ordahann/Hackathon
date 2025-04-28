@@ -24,7 +24,7 @@ const EmployeesClosedTicketsBarChart = ({ data }) => {
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData}>
           <XAxis 
-            dataKey="name"
+            dataKey="name" tick={false}
           />
           <YAxis />
           <Tooltip

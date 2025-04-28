@@ -142,3 +142,15 @@ export async function getEmployeesMonthlyTrends(department, subDepartment, start
     return response.json();
   }
 
+// בקריאה ל־/api/predict-top-category
+export async function predictTopCategory(department, subDepartment) {
+    const params = new URLSearchParams();
+    if (department) params.append("department", department);
+    if (subDepartment) params.append("sub_department", subDepartment);
+  
+    const response = await fetch(`http://127.0.0.1:5000/api/predict-top-category?${params.toString()}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch prediction: ${response.statusText}`);
+    }
+    return response.json();
+  }

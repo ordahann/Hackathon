@@ -96,13 +96,27 @@ const DepartmentDetails = () => {
 
   return (
     <div className="w-full h-full overflow-auto p-6 text-center z-10 text-center relative">
-      {/* כפתור חזרה */}
       <div className="absolute top-6 right-6 text-center">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           className="px-6 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg shadow-md hover:scale-105 transition-transform duration-300"
         >
           חזרה
+        </button>
+      </div>
+
+      <div className="absolute top-6 left-6 text-center"> 
+        <button
+          onClick={() => {
+            if (selectedSubDepartment) {
+              navigate(`/PredictHighTickets?department=${departmentName}&sub_department=${selectedSubDepartment}`);
+            } else {
+              alert("בחרי קודם מחלקה לפני המעבר לחיזוי!");
+            }
+          }}
+          className="px-6 py-2 bg-gradient-to-r from-purple-400 to-purple-600 text-white rounded-lg shadow-md hover:scale-105 transition-transform duration-300"
+        >
+          חיזוי
         </button>
       </div>
 

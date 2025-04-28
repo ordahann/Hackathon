@@ -16,6 +16,8 @@ from processing.data_analysis_employee import (
     get_employees_closed_tickets_count, get_employees_closed_tickets_percentage_from_all_closed_tickets, get_employees_total_tickets_count, get_employees_total_tickets_percentage_from_all_tickets, get_current_tickets_status, get_employees_on_time_percentage, get_employees_overdue_percentage, get_employees_avg_handling_time, get_top_n_employees_scores,calculate_employee_z_scores_from_data, get_monthly_performance_trends, prepare_employees_performance_data
 )
 
+from processing.predict_high_tickets import predict_top_category
+
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -215,6 +217,16 @@ def api_employees_performance_table():
     start_date, end_date, department, sub_department = params
     result = prepare_employees_performance_data(df, department, sub_department, start_date, end_date)
     return jsonify(result)
+
+@app.route('/api/predict-top-category', methods=['GET'])
+def api_predict_top_category():
+    department = request.args.get('department')
+    sub_department = request.args.get('sub_department')
+    try:
+        prediction = predict_top_category(department, sub_department)
+        return jsonify({'predicted_category': prediction})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)

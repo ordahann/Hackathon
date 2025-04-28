@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 
 import MokedMainDashboard from "./pages/MokedMainDashboard";
 import DepartmentDetails from "./pages/DepartmentDetails";
+import PredictHighTickets from "./pages/PredictHighTickets";
 
 function App() {
 	return (
@@ -17,6 +18,7 @@ function App() {
 			<Routes>
 				<Route path='/' element={<MokedMainDashboard />} />
 				<Route path='/department-details/:departmentName' element={<DepartmentDetails />} />
+				<Route path="/PredictHighTickets" element={<PredictHighTickets />} />
 			</Routes>
 		</div>
 	);

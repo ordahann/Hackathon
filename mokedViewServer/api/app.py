@@ -1,4 +1,7 @@
 from flask import Flask, jsonify, request
+
+from flask_cors import CORS
+
 from processing.data_analysis import (
     load_data,
     tickets_by_entity,
@@ -9,6 +12,8 @@ from processing.data_analysis import (
 )
 
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 df = load_data()
 
 # Tickets by Entity

@@ -609,3 +609,32 @@ def calculate_employee_z_scores_from_data(
     top_n['rank'] = range(1, len(top_n) + 1)  # הוספת מיקום
 
     return top_n.to_dict(orient='records')
+
+
+def get_monthly_performance_trends(df, department, sub_department, start_date, end_date):
+    df['opened_date'] = pd.to_datetime(df['opened_date'], errors='coerce')
+    df['closed_date'] = pd.to_datetime(df['closed_date'], errors='coerce')
+
+    filtered_df = df[
+        (df['department'] == department) &
+        (df['sub_department'] == sub_department) &
+        (df['opened_date'] >= pd.to_datetime(start_date)) &
+        (df['opened_date'] <= pd.to_datetime(end_date)) &
+        (df['closed_date'].notnull())
+    ].copy()
+
+    if filtered_df.empty:
+        return []
+
+    filtered_df['month'] = filtered_df['opened_date'].dt.to_period('M').astype(str)
+
+    monthly_stats = (
+        filtered_df.groupby('month')
+        .agg(
+            avg_overdue_percentage=('overdue_hours', lambda x: (x > 0).sum() / len(x) * 100),
+            avg_handling_time_hours=('handling_time_hours', 'mean')
+        )
+        .reset_index()
+    )
+
+    return monthly_stats.to_dict(orient='records')

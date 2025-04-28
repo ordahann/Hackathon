@@ -11,17 +11,17 @@ const MokedDepartmentsTable = ({ data }) => {
     });
   
     return (
-      <div className="p-4 bg-gray-800 rounded-xl shadow-md">
-        <h3 className="text-xl font-bold mb-4">דירוג אגפים לפי אחוז חריגות</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden text-sm text-left">
+      <div className="p-4 bg-gray-800 rounded-xl shadow-md text-center">
+        <h3 className="text-xl font-bold mb-4 text-center">דירוג אגפים לפי אחוז חריגות</h3>
+        <div className="overflow-x-auto text-center">
+          <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden text-sm text-center">
             <thead>
               <tr className="text-gray-300 uppercase bg-gray-600">
-                <th className="px-4 py-3">אגף</th>
-                <th className="px-4 py-3">פניות פתוחות</th>
-                <th className="px-4 py-3">פניות סגורות בזמן</th>
-                <th className="px-4 py-3">פניות סגורות בחריגה</th>
-                <th className="px-4 py-3">% חריגות</th>
+                <th className="px-4 py-3 text-center">אגף</th>
+                <th className="px-4 py-3 text-center">פניות פתוחות</th>
+                <th className="px-4 py-3 text-center">פניות סגורות בזמן</th>
+                <th className="px-4 py-3 text-center">פניות סגורות בחריגה</th>
+                <th className="px-4 py-3 text-center">% חריגות</th>
               </tr>
             </thead>
             <tbody>

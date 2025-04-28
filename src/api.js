@@ -43,3 +43,14 @@ export async function getSummaryStatus(groupBy = "department", startDate = null,
     if (!response.ok) throw new Error("Failed to fetch summary status");
     return response.json();
 }
+
+// fetch tickets and overduetickest 
+export async function getMonthlyTicketsAndOverdues(startDate = null, endDate = null) {
+    const params = new URLSearchParams();
+    if (startDate) params.append("start_date", startDate);
+    if (endDate) params.append("end_date", endDate);
+  
+    const response = await fetch(`${BASE_URL}/monthly-tickets-and-overdues?${params.toString()}`);
+    if (!response.ok) throw new Error("Failed to fetch monthly tickets and overdues");
+    return response.json();
+}

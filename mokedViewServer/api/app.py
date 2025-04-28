@@ -8,7 +8,8 @@ from processing.data_analysis import (
     overdue_analysis_by_entity,
     workload_vs_overdue_by_entity,
     monthly_trends_by_entity,
-    summary_status_by_entity
+    summary_status_by_entity,
+    monthly_tickets_and_overdues
 )
 
 app = Flask(__name__)
@@ -59,6 +60,13 @@ def api_summary_status():
     end_date = request.args.get('end_date')
     group_by = request.args.get('group_by', 'department')
     result = summary_status_by_entity(df, group_by=group_by, start_date=start_date, end_date=end_date)
+    return jsonify(result)
+
+@app.route('/api/monthly-tickets-and-overdues', methods=['GET'])
+def api_monthly_tickets_and_overdues():
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    result = monthly_tickets_and_overdues(df, start_date=start_date, end_date=end_date)
     return jsonify(result)
 
 if __name__ == '__main__':

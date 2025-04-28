@@ -68,3 +68,15 @@ def summary_status_by_entity(df, group_by='department', start_date=None, end_dat
     summary[['open_tickets', 'closed_on_time', 'closed_overdue']] = summary[['open_tickets', 'closed_on_time', 'closed_overdue']].astype(int)
 
     return summary.to_dict(orient='records')
+
+# returns total tickets and overdue tickets
+def monthly_tickets_and_overdues(df, start_date=None, end_date=None):
+    df_filtered = filter_by_date(df, start_date, end_date)
+    df_filtered['month'] = pd.to_datetime(df_filtered['opened_date']).dt.to_period('M').astype(str)
+
+    result = df_filtered.groupby('month').agg(
+        total_tickets=('ticket_status', 'count'),
+        overdue_tickets=('overdue_hours', lambda x: (x > 0).sum())
+    ).reset_index()
+
+    return result.to_dict(orient='records')

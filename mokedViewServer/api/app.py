@@ -1,12 +1,15 @@
 from flask import Flask, jsonify, request
+
 from flask_cors import CORS
+
 from processing.data_analysis import (
     load_data,
     tickets_by_entity,
     overdue_analysis_by_entity,
     workload_vs_overdue_by_entity,
     monthly_trends_by_entity,
-    summary_status_by_entity
+    summary_status_by_entity,
+    monthly_tickets_and_overdues
 )
 
 from processing.data_analysis_employee import (
@@ -15,7 +18,7 @@ from processing.data_analysis_employee import (
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins":"*"}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 df = load_data()
 
@@ -209,6 +212,13 @@ def api_employees_performance_table():
     result = prepare_employees_performance_data(df, department, sub_department, start_date, end_date)
     return jsonify(result)
 
+
+@app.route('/api/monthly-tickets-and-overdues', methods=['GET'])
+def api_monthly_tickets_and_overdues():
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    result = monthly_tickets_and_overdues(df, start_date=start_date, end_date=end_date)
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
